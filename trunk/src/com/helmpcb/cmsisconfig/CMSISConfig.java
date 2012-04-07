@@ -5,6 +5,8 @@
 package com.helmpcb.cmsisconfig;
 
 import java.io.*;
+import java.net.URL;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -20,6 +22,7 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionListener {
 
+    private final String versionString = "v0.0.2";
     private final JFileChooser fileChooser = new JFileChooser();
     private CMSISConfigurator configurator;
     private File currentFile;
@@ -63,6 +66,7 @@ public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionList
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("CMSIS Configurator");
+        setIconImage(new ImageIcon(getClass().getResource("ConfigWizardProgramIcon.png")).getImage());
         setLocationByPlatform(true);
 
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
@@ -258,7 +262,8 @@ public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionList
     }//GEN-LAST:event_btnOpenActionPerformed
 
     private void mnuAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAboutActionPerformed
-        JOptionPane.showMessageDialog(this, "CMSIS Configurator v0.0.1\nBy Amr Bekhit\nhttp://www.helmpcb.com");
+        JOptionPane.showMessageDialog(this, "CMSIS Configurator " + 
+                versionString + "\nBy Amr Bekhit\nhttp://www.helmpcb.com");
     }//GEN-LAST:event_mnuAboutActionPerformed
 
     private void btnExpandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExpandActionPerformed

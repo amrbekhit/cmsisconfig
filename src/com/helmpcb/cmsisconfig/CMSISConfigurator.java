@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.tree.DefaultMutableTreeNode;
-import org.apache.commons.io.FilenameUtils;
 
 /**
  *
@@ -56,7 +55,7 @@ class CMSISConfigurator {
 
         sourceFile = new StringBuilder(new String(buffer));
         // Determine if this is an assembler or C file based on the extension
-        String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();
+        String extension = getExtension(file.getName()).toLowerCase();
         String commentRegex;
         if (extension.equals("c") || extension.equals("h")) {
             // This is a C source file
@@ -238,41 +237,19 @@ class CMSISConfigurator {
 
         return lastNodeInTree;
     }
-
-    private String sRepeat(char c, int n) {
-        String s = "";
-
-        for (int i = 0; i < n; ++i) {
-            s += c;
+    
+    private String getExtension(String name) {
+        String extension = "";
+        
+        // Find the location of the extension
+        int extLocation = name.lastIndexOf(".");
+        
+        // Did we find an extension?
+        if (extLocation != -1) {
+            // We did, so extract it
+            extension = name.substring(extLocation + 1);
         }
-
-        return s;
-    }
-
-    private String getSingleLineComment(String s) {
-        String result = "";
-        boolean insideString = false;
-        char[] characters = s.toCharArray();
-
-        for (int i = 0; i < characters.length; ++i) {
-            if (characters[i] == '"') {
-                // We've found a speech mark. Is it escaped?
-                if (i == 0 || characters[i - 1] != '\\') {
-                    // This is a non-escaped speech mark because
-                    // it is either at the beginning of the string or
-                    // is not preceeded by a backslach
-                    insideString = !insideString;
-                }
-            } else if (!insideString
-                    && characters[i] == '/'
-                    && (i + 1) < characters.length
-                    && characters[i + 1] == '/') {
-                // We've found '//' outside of a string
-                result = s.substring(i);
-                break;
-            }
-        }
-
-        return result;
+        
+        return extension;
     }
 }

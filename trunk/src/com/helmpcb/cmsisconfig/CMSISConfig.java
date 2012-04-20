@@ -22,7 +22,7 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionListener {
 
-    private final String versionString = "v0.0.2";
+    private final String versionString = "v0.0.3";
     private final JFileChooser fileChooser = new JFileChooser();
     private CMSISConfigurator configurator;
     private File currentFile;

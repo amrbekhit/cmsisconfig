@@ -468,7 +468,7 @@ class SelectionValueModifier
     // <N=xxxx>
 
     private static final Pattern SELECTION_PATTERN = Pattern.compile(
-            "<(\\d++)=>");
+            "<((?:0[xX][\\da-fA-F]++)|\\d++)=>");
     private long value;
 
     public SelectionValueModifier(String tag, String text) throws NodeException {
@@ -482,10 +482,11 @@ class SelectionValueModifier
         if (matcher.find()) {
             // Extract the value
             try {
-                value = Long.parseLong(matcher.group(1));
+                value = ParseNumber(matcher.group(1));
+                //value = Long.parseLong(matcher.group(1));
             } catch (NumberFormatException ex) {
                 // The tag does not have a valid number
-                throw new NodeException("Invalid field in modifier: " + tag);
+                throw new NodeException("Invalid number in modifier: " + tag);
             }
         } else {
             // The tag is not in the expected format

@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
@@ -21,7 +22,7 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionListener {
 
-    private final String versionString = "v0.0.4";
+    private final String versionString = "v0.0.5";
     private final JFileChooser fileChooser = new JFileChooser();
     private CMSISConfigurator configurator;
     private File currentFile;
@@ -31,8 +32,11 @@ public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionList
      */
     public CMSISConfig() {
         initComponents();
-        fileChooser.setFileFilter(new SourceFileFilter());
-        //tree.setCellRenderer(new Node.NodeRenderer());
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "Source files (*.c, *.h, *.s, *.inc)", 
+                "c", "h", "s", "inc");
+        fileChooser.setFileFilter(filter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
     }
 
     /**
@@ -241,9 +245,13 @@ public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionList
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "Unable to open file. " + ex.toString());
             } catch (NodeException ex) {
-                JOptionPane.showMessageDialog(this, "Error while parsing file: " + ex.toString());
+                JOptionPane.showMessageDialog(this, "Error while parsing a node: " + ex.toString());
             } catch (TargetException ex) {
-                JOptionPane.showMessageDialog(this, "Error while parsing file: " + ex.toString());
+                JOptionPane.showMessageDialog(this, "Error while parsing a target value: " + ex.toString());
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(this, ex.toString());
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Unable to parse file: " + ex.toString());
             }
         }
     }//GEN-LAST:event_mnuOpenActionPerformed
@@ -361,40 +369,6 @@ public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionList
         } finally {
             editorPanel.revalidate();
             editorPanel.repaint();
-        }
-    }
-
-    private class SourceFileFilter
-            extends javax.swing.filechooser.FileFilter {
-
-        @Override
-        public boolean accept(File f) {
-            // Is this a file?
-            if (f.isFile()) {
-                // Does this file have an extension?
-                int extensionIndex = f.getName().lastIndexOf(".");
-
-                if (extensionIndex == -1) {
-                    // No extension, so quit
-                    return false;
-                } else {
-                    // An extension was found so extract it
-                    String extension =
-                            f.getName().substring(extensionIndex).toLowerCase();
-                    if (extension.equals(".c") || extension.equals(".h")) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            } else {
-                return true;
-            }
-        }
-
-        @Override
-        public String getDescription() {
-            return "C Source/Header Files (*.c, *.h)";
         }
     }
 }

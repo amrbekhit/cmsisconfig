@@ -273,6 +273,13 @@ class NumericOption
                 initialValue = arithmeticModifier.getModifiedValueFromTarget(
                         Node.NumericTargets.get(skipValue).getValue(startBit, endBit));
 
+                // Check to see that the initial value lies within the max and min values
+                if (initialValue < minValue) {
+                    initialValue = minValue;
+                } else if (initialValue > maxValue) {
+                    initialValue = maxValue;
+                }
+                
                 SpinnerModel model = new SpinnerNumberModel(
                         initialValue, minValue, maxValue, stepValue);
 
@@ -328,6 +335,14 @@ class NumericOption
         } else if (control instanceof JSpinner) {
             // Set the value of the spinner
             JSpinner spinner = (JSpinner) control;
+            SpinnerNumberModel model = (SpinnerNumberModel)spinner.getModel();
+            // Make sure we're not outside the range of the spinner
+            if (modifiedValue < (Long)model.getMinimum()) {
+                modifiedValue = (Long)model.getMinimum();
+            } else if (modifiedValue > (Long)model.getMaximum()) {
+                modifiedValue = (Long)model.getMaximum();
+            }
+            
             spinner.setValue(modifiedValue);
         } else if (control instanceof JCheckBox) {
             // Set the value of the checkbox

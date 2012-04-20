@@ -5,7 +5,6 @@
 package com.helmpcb.cmsisconfig;
 
 import java.io.*;
-import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -22,7 +21,7 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionListener {
 
-    private final String versionString = "v0.0.3";
+    private final String versionString = "v0.0.4";
     private final JFileChooser fileChooser = new JFileChooser();
     private CMSISConfigurator configurator;
     private File currentFile;
@@ -382,7 +381,7 @@ public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionList
                     // An extension was found so extract it
                     String extension =
                             f.getName().substring(extensionIndex).toLowerCase();
-                    if (extension.equals(".c")) {
+                    if (extension.equals(".c") || extension.equals(".h")) {
                         return true;
                     } else {
                         return false;
@@ -395,7 +394,7 @@ public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionList
 
         @Override
         public String getDescription() {
-            return "C Source Files (*.c)";
+            return "C Source/Header Files (*.c, *.h)";
         }
     }
 }

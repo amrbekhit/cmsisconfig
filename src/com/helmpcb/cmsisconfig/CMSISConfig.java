@@ -22,21 +22,27 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionListener {
 
-    private final String versionString = "v0.0.6";
+    private final String formTitle = "CMSIS Configurator";
+    private final String versionString = "v0.0.7";
     private final JFileChooser fileChooser = new JFileChooser();
     private CMSISConfigurator configurator;
     private File currentFile;
 
     /**
      * Creates new form CMSISConfig
+     * @param fileToOpen File to open by default
      */
-    public CMSISConfig() {
+    public CMSISConfig(File fileToOpen) {
         initComponents();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "Source files (*.c, *.h, *.s, *.inc)", 
                 "c", "h", "s", "inc");
         fileChooser.setFileFilter(filter);
         fileChooser.setAcceptAllFileFilterUsed(false);
+        if (fileToOpen != null) {
+            currentFile = fileToOpen;
+            openFile();
+        }
     }
 
     /**
@@ -194,11 +200,11 @@ public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionList
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(editorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGap(10, 10, 10)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -223,36 +229,41 @@ public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionList
         }
     }//GEN-LAST:event_mnuSaveActionPerformed
 
+    private void openFile() {
+        this.setTitle(formTitle + " - " + currentFile.getName());
+        // Clear the tree
+        tree.setModel(null);
+        try {
+            // Open the requested file
+            configurator = new CMSISConfigurator(currentFile);
+            tree.setModel(new DefaultTreeModel(configurator.topNode));
+            tree.addTreeSelectionListener(this);
+            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+            // Enable the save buttons
+            mnuSave.setEnabled(true);
+            mnuSaveAs.setEnabled(true);
+            btnSave.setEnabled(true);
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(this, "Unable to find file '"
+                    + fileChooser.getSelectedFile().getName() + "'. " + ex.toString());
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Unable to open file. " + ex.toString());
+        } catch (NodeException ex) {
+            JOptionPane.showMessageDialog(this, "Error while parsing a node: " + ex.toString());
+        } catch (TargetException ex) {
+            JOptionPane.showMessageDialog(this, "Error while parsing a target value: " + ex.toString());
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.toString());
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Unable to parse file: " + ex.toString());
+        }        
+    }
+    
     private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuOpenActionPerformed
         int retval = fileChooser.showOpenDialog(this);
         if (retval == JFileChooser.APPROVE_OPTION) {
-            // Clear the tree
-            tree.setModel(null);
-            try {
-                // Open the requested file
-                currentFile = fileChooser.getSelectedFile();
-                configurator = new CMSISConfigurator(currentFile);
-                tree.setModel(new DefaultTreeModel(configurator.topNode));
-                tree.addTreeSelectionListener(this);
-                tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-                // Enable the save buttons
-                mnuSave.setEnabled(true);
-                mnuSaveAs.setEnabled(true);
-                btnSave.setEnabled(true);
-            } catch (FileNotFoundException ex) {
-                JOptionPane.showMessageDialog(this, "Unable to find file '"
-                        + fileChooser.getSelectedFile().getName() + "'. " + ex.toString());
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(this, "Unable to open file. " + ex.toString());
-            } catch (NodeException ex) {
-                JOptionPane.showMessageDialog(this, "Error while parsing a node: " + ex.toString());
-            } catch (TargetException ex) {
-                JOptionPane.showMessageDialog(this, "Error while parsing a target value: " + ex.toString());
-            } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(this, ex.toString());
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Unable to parse file: " + ex.toString());
-            }
+            currentFile = fileChooser.getSelectedFile();
+            openFile();
         }
     }//GEN-LAST:event_mnuOpenActionPerformed
 
@@ -318,6 +329,7 @@ public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionList
         }
         //</editor-fold>
 
+        final String args_copy[] = args;
         /*
          * Create and display the form
          */
@@ -325,7 +337,17 @@ public class CMSISConfig extends javax.swing.JFrame implements TreeSelectionList
 
             @Override
             public void run() {
-                new CMSISConfig().setVisible(true);
+                File fileToOpen = null;
+                
+                if (args_copy.length > 0) {
+                    fileToOpen = new File(args_copy[0]);
+                    if (!(fileToOpen.exists() && !fileToOpen.isDirectory())) {
+                        // This is not a valid file
+                        System.err.println("Unable to open " + args_copy[0]);
+                        System.exit(1);
+                    }
+                }
+                new CMSISConfig(fileToOpen).setVisible(true);
             }
         });
     }
